@@ -1,6 +1,8 @@
 import './App.css'
 import React, { useState, useRef, useEffect } from 'react'
 import MessageBubble from './components/MessageBubble'
+import ElfsAvatar from './components/ElfsAvatar';
+
 
 interface Message {
   text: string;
@@ -54,6 +56,7 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
+        <ElfsAvatar size={32} />
         <h1>EventElf</h1>
       </header>
 

@@ -1,0 +1,11 @@
+.avatar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #5a8262; /* Same color as user message bubble */
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    min-width: 32px;
+    min-height: 32px;
+  }
