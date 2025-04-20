@@ -29,10 +29,8 @@ def get_calendar_service():
     return service
     
 def create_event(event_params):
-    """Creates a Google Calendar event"""
     service = get_calendar_service()
 
-    # Build the start and end datetime strings (assuming UTC here, adjust as needed)
     start_datetime = f"{event_params['date']}T{event_params['start_time']}:00"
     end_datetime = f"{event_params['date']}T{event_params['end_time']}:00"
 
@@ -55,9 +53,3 @@ def create_event(event_params):
     created_event = service.events().insert(calendarId='primary', body=event_body).execute()
     return created_event
 
-def main():
-    import GUI
-    GUI.main()
-
-if __name__ == '__main__':
-    main()

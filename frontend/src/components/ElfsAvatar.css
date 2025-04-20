@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #5a8262; /* Same color as user message bubble */
+    background-color: #5a8262; 
     color: white;
     border-radius: 50%;
     font-weight: bold;

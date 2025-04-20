@@ -64,7 +64,7 @@ def run_conversation(content, callback=None):
     }]
     
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4.1-nano",
         messages=messages,
         tools=tools,
         tool_choice="auto"

@@ -50,6 +50,21 @@
   .auth-button:hover {
     background-color: #4a6d52;
   }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 20px;
+  }
+  
+  .loading-container h2 {
+    color: #5a8262;
+    font-size: 18px;
+    font-weight: 500;
+  }
   
   .chat-container {
     flex: 1;
@@ -62,6 +77,21 @@
     flex: 1;
     overflow-y: auto;
     padding: 15px;
+  }
+
+  .thinking-indicator {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+  }
+  
+  .thinking-bubble {
+    background-color: #f1f3f6;
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin-left: 8px;
+    font-size: 14px;
+    color: #212529;
   }
    
   .input-container {
