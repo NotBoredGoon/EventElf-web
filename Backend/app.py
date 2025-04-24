@@ -88,4 +88,4 @@ def test():
     return "Flask server is running correctly!"
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, ssl_context='adhoc', debug=True)
+    app.run(debug=True, port=5000)
