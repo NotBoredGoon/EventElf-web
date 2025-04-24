@@ -72,8 +72,8 @@ def oauth2callback():
     flow.fetch_token(authorization_response=request.url)
     credentials = flow.credentials
     session['credentials'] = credentials_to_dict(credentials)
-    return redirect('/')
-
+    return redirect('http://localhost:5173')
+    
 @auth_bp.route('/logout')
 def logout():
     if 'credentials' in session:

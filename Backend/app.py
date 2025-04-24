@@ -7,6 +7,9 @@ import os
 import secrets
 from auth_routes import auth_bp, get_credentials_from_session
 
+# ONLY IN DEVELOPMENT
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)  # Generate a secure secret key for sessions
 CORS(app, supports_credentials=True)  # Enable CORS with credential support
