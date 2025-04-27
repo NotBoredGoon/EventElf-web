@@ -1,4 +1,4 @@
-from flask import Blueprint, session, redirect, url_for, request, jsonify
+from flask import Blueprint, session, redirect, url_for, request, jsonify, render_template_string
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 import os
@@ -23,16 +23,16 @@ def credentials_to_dict(credentials):
     }
 
 def get_credentials_from_session():
-    if 'credentials' not in session:
+    if 'google_creds' not in session:
         return None
     
     return Credentials(
-        token=session['credentials']['token'],
-        refresh_token=session['credentials']['refresh_token'],
-        token_uri=session['credentials']['token_uri'],
-        client_id=session['credentials']['client_id'],
-        client_secret=session['credentials']['client_secret'],
-        scopes=session['credentials']['scopes']
+        token=session['google_creds']['token'],
+        refresh_token=session['google_creds']['refresh_token'],
+        token_uri=session['google_creds']['token_uri'],
+        client_id=session['google_creds']['client_id'],
+        client_secret=session['google_creds']['client_secret'],
+        scopes=session['google_creds']['scopes']
     )
 
 @auth_bp.route('/login')
@@ -70,21 +70,43 @@ def oauth2callback():
     )
     
     flow.fetch_token(authorization_response=request.url)
-    credentials = flow.credentials
-    session['credentials'] = credentials_to_dict(credentials)
-    return redirect('http://localhost:5173')
+    creds = flow.credentials
+    # session['credentials'] = credentials_to_dict(creds)
+    session["google_creds"] = {
+        "token": creds.token,   # This is the access token
+        "refresh_token": creds.refresh_token,
+        "token_uri": creds.token_uri,
+        "client_id": creds.client_id,
+        "client_secret": creds.client_secret,
+        "scopes": creds.scopes
+    }
+
+    # generate your own JWT or send back raw token:
+    payload = {"success": True, "token": creds.token}
+    # Render a tiny page that messages back and closes the popup
+    return render_template_string("""
+      <html><body>
+      <script>
+        // send the token back to opener
+        window.opener.postMessage({{payload|tojson}}, window.origin);
+        // close this popup
+        window.close();
+      </script>
+      </body></html>
+    """, payload=payload)
+    # return redirect('http://localhost:5173')
     
 @auth_bp.route('/logout')
 def logout():
-    if 'credentials' in session:
-        del session['credentials']
+    if 'google_creds' in session:
+        del session['google_creds']
     
     return redirect('/')
 
 @auth_bp.route('/status')
 def auth_status():
     # may be able to remove jsonify
-    if 'credentials' in session:
+    if 'google_creds' in session:
         return jsonify({'authenticated': True})
     else:
         return jsonify({'authenticated': False})
