@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 import ai_model
 from googleapiclient.discovery import build
@@ -12,7 +12,16 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)  # Generate a secure secret key for sessions
-CORS(app, supports_credentials=True)  # Enable CORS with credential support
+app.config.update(
+    SESSION_COOKIE_SAMESITE="None",
+    SESSION_COOKIE_SECURE=False,    # only for dev; browser requires secure+HTTPS if SameSite=None
+)
+CORS(app, 
+     supports_credentials=True,
+     resources={
+       r"/auth/*": {"origins": "http://localhost:5173"},
+       r"/api/*":  {"origins": "http://localhost:5173"},
+     })  # Enable CORS with credential support
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 
@@ -33,7 +42,10 @@ def create_events_endpoint():
     """
     Create calendar events with the provided parameters using OAuth credentials from session
     """
+    app.logger.info(f"Session data present: {session.keys()}")
     credentials = get_credentials_from_session()
+    app.logger.info(f"google_creds in session? {bool(credentials)}")
+
     if not credentials:
         return jsonify({"error": "Not authenticated", "auth_required": True}), 401
     

@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode, useCa
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: () => void;
+  login: (onSuccess?: () => void) => void;
   logout: () => void;
   token: string | null;
 }
@@ -26,6 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+  const [onAuthSuccess, setOnAuthSuccess] = useState<(() => void) | undefined>();
 
   // Check authentication status on mount
   useEffect(() => {
@@ -47,7 +48,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = useCallback(() => {
+  const login = useCallback((callback?: () => void) => {
+    if (callback) {
+      setOnAuthSuccess(() => callback);
+    }
     // open the OAuth URL in a popup
     window.open(
       '/auth/login',
@@ -55,25 +59,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       'width=500,height=700'
     );
 
-    // listen for the message from the popup
-    window.addEventListener('message', onAuthMessage);
-
     function onAuthMessage(event: MessageEvent<{ success: boolean; token: string }>) {
-      // // only accept messages from backend origin
-      if (event.origin !== window.origin) return;
+      console.log('function onAuthMessage is called');
+      // only accept messages from backend origin
+      if (event.origin !== 'http://127.0.0.1:5000') {
+        console.warn('Ignored message from unknown origin:', event.origin);
+        return;
+      }
 
       // event.data might be { success: true, token: '…', user: {…} }
       const { success, token } = event.data;
+      console.log("Success: ", success, "Token: ", token);
       if (success && token) {
         // store token however you like (e.g. localStorage, context, etc.)
+        console.log('in success && token if statement');
         localStorage.setItem('jwt', token);
         setToken(token);
+        setIsAuthenticated(true);
+        // Call the success callback if it exists
+        if (onAuthSuccess) {
+          onAuthSuccess();
+          setOnAuthSuccess(undefined);
+        }
       }
       window.removeEventListener('message', onAuthMessage);
     }
 
     window.addEventListener('message', onAuthMessage);
-  }, []);
+  }, [onAuthSuccess]);
 
   const logout = () => {
     // Redirect to the backend logout route

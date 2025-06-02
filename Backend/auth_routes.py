@@ -63,7 +63,7 @@ def login():
 def oauth2callback():
     state = session.get('state', None)
     flow = Flow.from_client_secrets_file(
-        CREDENTIALS_PATH,
+        CREDENTIALS_PATH,   
         scopes=SCOPES,
         state=state,
         redirect_uri=url_for('auth.oauth2callback', _external=True)
@@ -84,13 +84,13 @@ def oauth2callback():
     # generate your own JWT or send back raw token:
     payload = {"success": True, "token": creds.token}
     # Render a tiny page that messages back and closes the popup
+    print(f"Sending postMessage with payload: {payload}")
     return render_template_string("""
       <html><body>
       <script>
         // send the token back to opener
-        window.opener.postMessage({{payload|tojson}}, window.origin);
-        // close this popup
-        window.close();
+        window.opener.postMessage({{payload|tojson}}, 'http://localhost:5173');
+        window.close();            
       </script>
       </body></html>
     """, payload=payload)

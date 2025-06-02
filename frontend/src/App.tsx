@@ -27,7 +27,7 @@ function App() {
   const { isAuthenticated, isLoading, login } = useAuth();
   
   // Change this later to match your flask backend
-  const API_URL = 'http://127.0.0.1:5000/api';
+  const API_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
     setMessages([{
@@ -85,6 +85,7 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ message }),
+        credentials: 'include',       // Maybe only used in development
     });
 
     const data = await response.json();
@@ -130,7 +131,7 @@ function App() {
       addMessage('You need to authorize access to your Google Calendar first. I\'ll redirect you to the authorization page.', false);
       // Set a timeout to redirect to login after showing the message
       setTimeout(() => {
-        login();
+        login(createPendingEvents);
       }, 2000);
       return;
     }
